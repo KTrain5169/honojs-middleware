@@ -70,6 +70,94 @@ To infer the input type of a validated target, import `InferInput` from `hono/va
 import type { InferInput } from 'hono/validator'
 ```
 
+## Grouping errors
+
+This validator returns ungrouped errors, which can be inconvenient when mapping errors to form fields:
+
+```json
+{
+  "data": {
+    "name": "john doe",
+    "age": "twenty",
+    "role": "admin"
+  },
+  "error": [
+    {
+      "origin": "string",
+      "code": "too_big",
+      "maximum": 4,
+      "inclusive": true,
+      "path": ["name"],
+      "message": "Name is too long"
+    },
+    {
+      "origin": "string",
+      "code": "invalid_format",
+      "format": "regex",
+      "pattern": "/^\\w+$/",
+      "path": ["name"],
+      "message": "Name must only contain alphanumeric characters"
+    },
+    {
+      "expected": "number",
+      "code": "invalid_type",
+      "path": ["age"],
+      "message": "Age must be a number"
+    },
+    {
+      "code": "unrecognized_keys",
+      "keys": ["role"],
+      "path": [],
+      "message": "Unrecognized key: \"role\""
+    }
+  ],
+  "success": false
+}
+```
+
+To group them, use `flattenErrors` inside a `sValidator` hook:
+
+```ts
+import type { StandardSchemaV1 } from '@standard-schema/spec'
+import type { ValidationTargets } from 'hono'
+import { sValidator, flattenErrors } from '@hono/standard-validator'
+import * as z from 'zod'
+
+export const validate = <Target extends keyof ValidationTargets, Schema extends StandardSchemaV1>(
+  target: Target,
+  schema: Schema
+) =>
+  sValidator(target, schema, (result, c) => {
+    if (!result.success) {
+      const flattenedError = flattenErrors(result.error)
+      return c.json(flattenedError, 400)
+    }
+  })
+```
+
+Now, error messages are grouped by field as arrays under the `fieldErrors` property, while unknown keys or root-level issues go inside `fieldErrors` or `formErrors` depending on the validation library you use:
+
+```jsonc
+// Zod
+{
+  "formErrors": ["Unrecognized key: \"role\""],
+  "fieldErrors": {
+    "name": ["Name is too long", "Name must only contain alphanumeric characters"],
+    "age": ["Age must be a number"],
+  },
+}
+
+// Valibot
+{
+  "formErrors": [],
+  "fieldErrors": {
+    "name": ["Name is too long", "Name must only contain alphanumeric characters"],
+    "age": ["Age must be a number"],
+    "role": ["Invalid key: Expected never but received \"role\""]
+  },
+}
+```
+
 ## Author
 
 Rokas Muningis <https://github.com/muningis>
