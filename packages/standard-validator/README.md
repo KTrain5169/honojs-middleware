@@ -135,7 +135,7 @@ export const validate = <Target extends keyof ValidationTargets, Schema extends 
   })
 ```
 
-Now, error messages are grouped by field as arrays under the `fieldErrors` property, while unknown keys or root-level issues go inside `fieldErrors` or `formErrors` depending on the validation library you use:
+Now, error messages are grouped by field as arrays under the `fieldErrors` property. As for unknown keys or root-level issues, they go inside `fieldErrors` or `formErrors`, depending on the validation library you use:
 
 ```jsonc
 // Zod
