@@ -122,7 +122,7 @@ To group them, use `flattenErrors` inside a `sValidator` hook:
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 
 import type { ValidationTargets } from 'hono'
-import { sValidator, flattenErrors } from '@hono/standard-validator'
+import { flattenErrors, sValidator } from '@hono/standard-validator'
 
 export const validate = <Target extends keyof ValidationTargets, Schema extends StandardSchemaV1>(
   target: Target,
