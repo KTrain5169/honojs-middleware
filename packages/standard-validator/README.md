@@ -94,7 +94,7 @@ This validator returns ungrouped errors, which can be inconvenient when mapping 
       "origin": "string",
       "code": "invalid_format",
       "format": "regex",
-      "pattern": "/^\\w+$/",
+      "pattern": "/^[0-9A-Za-z_]+$/",
       "path": ["name"],
       "message": "Name must only contain alphanumeric characters"
     },
