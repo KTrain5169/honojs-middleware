@@ -118,7 +118,9 @@ This validator returns ungrouped errors, which can be inconvenient when mapping 
 To group them, use `flattenErrors` inside a `sValidator` hook:
 
 ```ts
+// Copy or install the StandardSchema types to your project
 import type { StandardSchemaV1 } from '@standard-schema/spec'
+
 import type { ValidationTargets } from 'hono'
 import { sValidator, flattenErrors } from '@hono/standard-validator'
 
